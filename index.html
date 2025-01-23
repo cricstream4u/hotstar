@@ -1,113 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" type="image/x-icon" href="Cric stream Favicon.jpg">
+    <title>TG- @cric_stream</title>
+    <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css">
+    <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+    <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+    <style>
+        .video-container {
+            width: 100%;
+            max-width: 100%;
+            margin: 0 auto;
+            margin-top: 5px;
+            text-align: center;
+        }
 
+        video {
+            width: 100%;
+            height: auto;
+        }
 
-<script>
-const express = require('express');
-const { createProxyMiddleware } = require('http-proxy-middleware');
-const path = require('path');
-
-const app = express();
-
-// Proxy Middleware
-app.use('/proxy', createProxyMiddleware({
-  target: 'https://live12p.hotstar.com',
-  changeOrigin: true,
-  pathRewrite: {
-    '^https://cricstream4u.github.io/hotstar/': '', // Removes '/proxy' from the URL
-  },
-  onProxyRes: (proxyRes) => {
-    proxyRes.headers['Access-Control-Allow-Origin'] = '*'; // Add CORS headers
-  },
-}));
-</script>
-// Serve the HTML file
-app.get('/', (req, res) => {
-  res.send(`
-    <!DOCTYPE html>
-    <html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <link rel="shortcut icon" type="image/x-icon" href="Cric stream Favicon.jpg">
-        <title>TG- @cric_stream</title>
-        <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
-        <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
-        <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
-        <style>
-            body {
-                margin: 0;
-                padding: 5px;
-                font-family: Arial, sans-serif;
-            }
-
-            .video-container {
-                width: 100%;
-                background-color: white;
-            }
-
+        @media (orientation: landscape) and (fullscreen) {
             video {
-                width: 100%;
-                height: auto;
+                width: 100vw;
+                height: 100vh;
+                object-fit: contain;
             }
+        }
 
-            .content {
-                padding: 0;
-                background-color: white;
+           /* Popup styles */
+        .popup {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: #1c1c1c;
+            border-radius: 20px; /* Rounded card style */
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0px 0px 15px rgba(255, 255, 255, 0.2);
+            z-index: 1002;
+            width: 90%;
+            max-width: 400px;
+            animation: fadeIn 0.5s;
+        }
+
+        .popup h2 {
+            color: #ffcc00;
+            margin-bottom: 10px;
+            font-size: 20px;
+        }
+
+        .popup p {
+            margin-bottom: 20px;
+            color: #ccc;
+            font-size: 16px;
+        }
+
+        .popup button {
+            background-color: #0088cc;
+            color: #fff;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-bottom: 10px;
+            width: 100%;
+        }
+
+        .popup button:hover {
+            background-color: #006699;
+        }
+
+        .popup .close-btn {
+            background-color: #555;
+        }
+
+        .popup .close-btn:hover {
+            background-color: #333;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
             }
-        </style>
-    </head>
-    <body>
-        <div class="video-container">
-            <video preload="none" id="video" autoplay controls crossorigin poster="CRIC stream Thumbnail .jpg"></video>
-        </div>
+            to {
+                opacity: 1;
+            }
+        }
+    </style>
+</head>
+<body>
 
-        <script>
-            document.addEventListener("DOMContentLoaded", () => {
-                const videoUrl = 'http://localhost:3000/proxy/hls/live/2116467/inallow-sa20-2025/hin/1540036712/15mindvrm016a10b102dd4f405d8a70072b7b6be49823january2025/master_apmf_480_4.m3u8';
-
-                const video = document.getElementById('video');
-                const defaultOptions = {
-                    controls: [
-                        'play-large',
-                        'play',
-                        'progress',
-                        'duration',
-                        'live',
-                        'mute',
-                        'settings',
-                        'pip',
-                        'airplay',
-                        'fullscreen',
-                    ],
-                    settings: ['quality'],
-                };
-
-                if (Hls.isSupported()) {
-                    const hls = new Hls();
-                    hls.loadSource(videoUrl);
-                    hls.attachMedia(video);
-
-                    hls.on(Hls.Events.MANIFEST_PARSED, () => {
-                        const player = new Plyr(video, defaultOptions);
-                    });
-
-                    hls.on(Hls.Events.ERROR, (event, data) => {
-                        console.error('HLS.js Error:', data);
-                    });
-                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-                    video.src = videoUrl;
-                    const player = new Plyr(video, defaultOptions);
-                } else {
-                    document.body.innerHTML = "<h2>HLS not supported on your browser</h2>";
-                }
-            });
-        </script>
-    </body>
-    </html>
-  `);
-});
-
-// Start the server
-const PORT = 3000;
-app.listen(PORT, () => {
-  console.log(`Server is running on http://localhost:${PORT}`);
-});
+    <div tabindex="0" class="plyr plyr--full-ui plyr--video plyr--html5 plyr--fullscreen-enabled plyr--pip-supported plyr__poster-enabled plyr--playing plyr--hide-controls"><div class="plyr__controls"><button class="plyr__controls__item plyr__control plyr__control--pressed" type="button" data-plyr="play" aria-label="Pause"><svg class="icon--pressed" aria-hidden="true" focusable="false"><use xlink:href="#plyr-pause"></use></svg><svg class="icon--not-pressed" aria-hidden="true" focusable="false"><use xlink:href="#plyr-play"></use></svg><span class="label--pressed plyr__sr-only">Pause</span><span class="label--not-pressed plyr__sr-only">Play</span></button><div class="plyr__controls__item plyr__progress__container"><div class="plyr__progress"><input data-plyr="seek" type="range" min="0" max="100" step="0.01" value="0" autocomplete="off" role="slider" aria-label="Seek" aria-valuemin="0" aria-valuemax="413.128" aria-valuenow="382.594489" id="plyr-seek-3306" aria-valuetext="06:22 of 06:53" style="--value: 92.61%;"><progress class="plyr__progress__buffer" min="0" max="100" value="99.94384282837281" role="progressbar" aria-hidden="true">% buffered</progress><span class="plyr__tooltip">00:00</span></div></div><div class="plyr__controls__item plyr__time--current plyr__time" aria-label="Current time">-00:30</div><div class="plyr__controls__item plyr__volume"><button type="button" class="plyr__control" data-plyr="mute"><svg class="icon--pressed" aria-hidden="true" focusable="false"><use xlink:href="#plyr-muted"></use></svg><svg class="icon--not-pressed" aria-hidden="true" focusable="false"><use xlink:href="#plyr-volume"></use></svg><span class="label--pressed plyr__sr-only">Unmute</span><span class="label--not-pressed plyr__sr-only">Mute</span></button><input data-plyr="volume" type="range" min="0" max="1" step="0.05" value="1" autocomplete="off" role="slider" aria-label="Volume" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" id="plyr-volume-3306" aria-valuetext="100.0%" style="--value: 100%;"></div><button class="plyr__controls__item plyr__control" type="button" data-plyr="captions"><svg class="icon--pressed" aria-hidden="true" focusable="false"><use xlink:href="#plyr-captions-on"></use></svg><svg class="icon--not-pressed" aria-hidden="true" focusable="false"><use xlink:href="#plyr-captions-off"></use></svg><span class="label--pressed plyr__sr-only">Disable captions</span><span class="label--not-pressed plyr__sr-only">Enable captions</span></button><div class="plyr__controls__item plyr__menu"><button aria-haspopup="true" aria-controls="plyr-settings-3306" aria-expanded="false" type="button" class="plyr__control" data-plyr="settings"><svg aria-hidden="true" focusable="false"><use xlink:href="#plyr-settings"></use></svg><span class="plyr__sr-only">Settings</span></button><div class="plyr__menu__container" id="plyr-settings-3306" hidden=""><div style=""><div id="plyr-settings-3306-home" hidden=""><div role="menu"><button data-plyr="settings" type="button" class="plyr__control plyr__control--forward" role="menuitem" aria-haspopup="true" hidden=""><span>Captions<span class="plyr__menu__value">Disabled</span></span></button><button data-plyr="settings" type="button" class="plyr__control plyr__control--forward" role="menuitem" aria-haspopup="true" hidden=""><span>Quality<span class="plyr__menu__value">0p</span></span></button><button data-plyr="settings" type="button" class="plyr__control plyr__control--forward" role="menuitem" aria-haspopup="true"><span>Speed<span class="plyr__menu__value">Normal</span></span></button></div></div><div id="plyr-settings-3306-captions" hidden=""><button type="button" class="plyr__control plyr__control--back"><span aria-hidden="true">Captions</span><span class="plyr__sr-only">Go back to previous menu</span></button><div role="menu"></div></div><div id="plyr-settings-3306-quality" hidden=""><button type="button" class="plyr__control plyr__control--back"><span aria-hidden="true">Quality</span><span class="plyr__sr-only">Go back to previous menu</span></button><div role="menu"></div></div><div id="plyr-settings-3306-speed"><button type="button" class="plyr__control plyr__control--back"><span aria-hidden="true">Speed</span><span class="plyr__sr-only">Go back to previous menu</span></button><div role="menu"><button data-plyr="speed" type="button" role="menuitemradio" class="plyr__control" aria-checked="false" value="0.5"><span>0.5×</span></button><button data-plyr="speed" type="button" role="menuitemradio" class="plyr__control" aria-checked="false" value="0.75"><span>0.75×</span></button><button data-plyr="speed" type="button" role="menuitemradio" class="plyr__control" aria-checked="true" value="1"><span>Normal</span></button><button data-plyr="speed" type="button" role="menuitemradio" class="plyr__control" aria-checked="false" value="1.25"><span>1.25×</span></button><button data-plyr="speed" type="button" role="menuitemradio" class="plyr__control" aria-checked="false" value="1.5"><span>1.5×</span></button><button data-plyr="speed" type="button" role="menuitemradio" class="plyr__control" aria-checked="false" value="1.75"><span>1.75×</span></button><button data-plyr="speed" type="button" role="menuitemradio" class="plyr__control" aria-checked="false" value="2"><span>2×</span></button><button data-plyr="speed" type="button" role="menuitemradio" class="plyr__control" aria-checked="false" value="4"><span>4×</span></button></div></div></div></div></div><button class="plyr__controls__item plyr__control" type="button" data-plyr="pip"><svg aria-hidden="true" focusable="false"><use xlink:href="#plyr-pip"></use></svg><span class="plyr__sr-only">PIP</span></button><button class="plyr__controls__item plyr__control" type="button" data-plyr="fullscreen"><svg class="icon--pressed" aria-hidden="true" focusable="false"><use xlink:href="#plyr-exit-fullscreen"></use></svg><svg class="icon--not-pressed" aria-hidden="true" focusable="false"><use xlink:href="#plyr-enter-fullscreen"></use></svg><span class="label--pressed plyr__sr-only">Exit fullscreen</span><span class="label--not-pressed plyr__sr-only">Enter fullscreen</span></button></div><div class="plyr__video-wrapper"><video autoplay="" crossorigin="" poster="https://i.ibb.co/MP1cyWG/sportspulselive-20240906-001603-0000.png" playsinline="" src="blob:https://rriptv.top/755ac5fd-a851-418f-8857-9cb7806b6920" data-poster="https://i.ibb.co/MP1cyWG/sportspulselive-20240906-001603-0000.png">
+&lt;<source type="application/vnd.apple.mpegurl" src="play.php?key=RRIPTV&amp;c=ten1hd"></video><div class="plyr__poster" style="background-image: url(&quot;https://i.ibb.co/MP1cyWG/sportspulselive-20240906-001603-0000.png&quot;);"></div></div><div class="plyr__captions"></div><button type="button" class="plyr__control plyr__control--overlaid plyr__control--pressed" data-plyr="play" aria-label="Pause"><svg aria-hidden="true" focusable="false"><use xlink:href="#plyr-play"></use></svg><span class="plyr__sr-only">Play</span></button></div>
+</body>
+</html>
