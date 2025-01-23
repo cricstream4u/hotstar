@@ -1,1 +1,113 @@
-abc
+
+
+
+const express = require('express');
+const { createProxyMiddleware } = require('http-proxy-middleware');
+const path = require('path');
+
+const app = express();
+
+// Proxy Middleware
+app.use('/proxy', createProxyMiddleware({
+  target: 'https://live12p.hotstar.com',
+  changeOrigin: true,
+  pathRewrite: {
+    '^https://cricstream4u.github.io/hotstar/': '', // Removes '/proxy' from the URL
+  },
+  onProxyRes: (proxyRes) => {
+    proxyRes.headers['Access-Control-Allow-Origin'] = '*'; // Add CORS headers
+  },
+}));
+
+// Serve the HTML file
+app.get('/', (req, res) => {
+  res.send(`
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="shortcut icon" type="image/x-icon" href="Cric stream Favicon.jpg">
+        <title>TG- @cric_stream</title>
+        <link rel="stylesheet" href="https://cdn.plyr.io/3.7.8/plyr.css" />
+        <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
+        <script src="https://cdn.plyr.io/3.7.8/plyr.js"></script>
+        <style>
+            body {
+                margin: 0;
+                padding: 5px;
+                font-family: Arial, sans-serif;
+            }
+
+            .video-container {
+                width: 100%;
+                background-color: white;
+            }
+
+            video {
+                width: 100%;
+                height: auto;
+            }
+
+            .content {
+                padding: 0;
+                background-color: white;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="video-container">
+            <video preload="none" id="video" autoplay controls crossorigin poster="CRIC stream Thumbnail .jpg"></video>
+        </div>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                const videoUrl = 'http://localhost:3000/proxy/hls/live/2116467/inallow-sa20-2025/hin/1540036712/15mindvrm016a10b102dd4f405d8a70072b7b6be49823january2025/master_apmf_480_4.m3u8';
+
+                const video = document.getElementById('video');
+                const defaultOptions = {
+                    controls: [
+                        'play-large',
+                        'play',
+                        'progress',
+                        'duration',
+                        'live',
+                        'mute',
+                        'settings',
+                        'pip',
+                        'airplay',
+                        'fullscreen',
+                    ],
+                    settings: ['quality'],
+                };
+
+                if (Hls.isSupported()) {
+                    const hls = new Hls();
+                    hls.loadSource(videoUrl);
+                    hls.attachMedia(video);
+
+                    hls.on(Hls.Events.MANIFEST_PARSED, () => {
+                        const player = new Plyr(video, defaultOptions);
+                    });
+
+                    hls.on(Hls.Events.ERROR, (event, data) => {
+                        console.error('HLS.js Error:', data);
+                    });
+                } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
+                    video.src = videoUrl;
+                    const player = new Plyr(video, defaultOptions);
+                } else {
+                    document.body.innerHTML = "<h2>HLS not supported on your browser</h2>";
+                }
+            });
+        </script>
+    </body>
+    </html>
+  `);
+});
+
+// Start the server
+const PORT = 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+});
