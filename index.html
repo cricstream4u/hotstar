@@ -1,6 +1,6 @@
 
 
-
+<script>
 const express = require('express');
 const { createProxyMiddleware } = require('http-proxy-middleware');
 const path = require('path');
@@ -18,7 +18,7 @@ app.use('/proxy', createProxyMiddleware({
     proxyRes.headers['Access-Control-Allow-Origin'] = '*'; // Add CORS headers
   },
 }));
-
+</script>
 // Serve the HTML file
 app.get('/', (req, res) => {
   res.send(`
